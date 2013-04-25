@@ -1,0 +1,17 @@
+ports réservés à l'IPL
+----------------------
+10101
+10102
+10103
+
+mémoire partagée (06-Syscalls-6.pdf) (p30->34)
+----------------------------------------------
+shmget = alouer de la memoire partagee
+shmctl = controler la memoire partagee
+shmat  = attacher une adresse de l'espace utilisateur
+shmdt  = detacher une adresse de l'espace utilisateur
+
+commandes utiles
+----------------
+- afficher les ports ouverts: netstat -lpt le p n'est pas obligatoire
+- rechercher dans le man: man -k larecherche
