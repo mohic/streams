@@ -1,14 +1,13 @@
-/*
-        Maxime LECAT (mlecat)
-        Christophe MOHIMONT (cmohimo)
-
-        ce fichier contient la fonction main démarrant le programme serveur
-*/
+/****************************************************************************\
+*        Maxime LECAT (mlecat)                                               *
+*        Christophe MOHIMONT (cmohimo)                                       *
+*                                                                            *
+*        ce fichier contient la fonction main démarrant le programme serveur *
+\****************************************************************************/
 
 #include "serversck.h"
 #include "game.h"
-
-#define MAX_JOUEUR 4
+#include "../common/common.h"
 
 // remarque, n'accepte que 1 client pour le moment
 
@@ -40,6 +39,11 @@ int main (int argc, char* argv[])
 
 	printf("Serveur en écoute sur le port %d\n", port);
 
+	// creation de la memoire partagee
+	int shmid = shmget(SHM_KEY, sizeof(struct game), IPC_CREAT);
+	struct game *g = (struct game *)shmat(shmid, NULL, 0);
+
+	// inscription d'un joueur
 	fd_set readfs;
 	struct timeval tv;
 
@@ -50,6 +54,8 @@ int main (int argc, char* argv[])
 	int nombreJoueurActuel = 0;
 
 	sockets[nombreJoueurActuel++] = accepterClient(sck);
+
+	//TODO timer 30 secondes (voir avec signal)
 
 	while(1) {
 		int ret = 0;
@@ -99,6 +105,8 @@ int main (int argc, char* argv[])
 		}
 	}
 
+	// destruction de la memoire partagee
+
 	return 0;
 
 	// lecture / envois de messages
@@ -110,6 +118,10 @@ int main (int argc, char* argv[])
 	for (i = 0; i < nombreJoueurActuel; i++) {
 		fermerSocket(sockets[i]);
 	}
+
+	// detacher la memoire et la marquer comme detruite
+	shmdt(g);
+	shmctl(shmid, IPC_RMID, 0);
 
 	// fermeture de la socket
 	printf("Good bye !!!\n");
