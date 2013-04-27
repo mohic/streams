@@ -1,9 +1,10 @@
-/*
-        Maxime LECAT (mlecat)
-        Christophe MOHIMONT (cmohimo)
-
-        ce fichier contient les fonctions pour utiliser un socket IPv4 en ecoute
-*/
+/*******************************************************\
+*       Maxime LECAT (mlecat)                           *
+*       Christophe MOHIMONT (cmohimo)                   *
+*                                                       *
+*       ce fichier contient les fonctions pour utiliser *
+*	un socket IPv4 en ecoute                        *
+\*******************************************************/
 
 #include "serversck.h"
 

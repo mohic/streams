@@ -1,9 +1,10 @@
-/*
-        Maxime LECAT (mlecat)
-        Christophe MOHIMONT (cmohimo)
-
-        ce fichier contient les declarations pour l'utilisation de socket cote serveur
-*/
+/*************************************************************************\
+*       Maxime LECAT (mlecat)                                             *
+*       Christophe MOHIMONT (cmohimo)                                     *
+*                                                                         *
+*       ce fichier contient les declarations pour l'utilisation de socket *
+*	cote serveur                                                      *
+\*************************************************************************/
 
 #ifndef __SERVERSCK_H__
 #define __SERVERSCK_H__

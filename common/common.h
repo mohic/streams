@@ -1,3 +1,10 @@
+/*****************************************************************\
+*        Maxime LECAT (mlecat)                                    *
+*        Christophe MOHIMONT (cmohimo)                            *
+*                                                                 *
+*        ce fichier contient les definitions, structures communes *
+\*****************************************************************/
+
 #ifndef __COMMON_H__
 #define __COMMON_H__
 

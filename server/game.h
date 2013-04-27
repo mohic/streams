@@ -1,3 +1,11 @@
+/**********************************************************************\
+*        Maxime LECAT (mlecat)                                         *
+*        Christophe MOHIMONT (cmohimo)                                 *
+*                                                                      *
+*        ce fichier contient la definition des fonctions de la logique *
+*        du jeux                                                       *
+\**********************************************************************/
+
 #ifndef __game_h__
 #define __game_h__
 

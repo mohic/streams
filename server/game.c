@@ -1,3 +1,10 @@
+/***********************************************\
+*        Maxime LECAT (mlecat)                  *
+*        Christophe MOHIMONT (cmohimo)          *
+*                                               *
+*        ce fichier contient la logique du jeux *
+\***********************************************/
+
 #include "game.h"
 
 int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid) {

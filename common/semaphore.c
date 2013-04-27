@@ -1,3 +1,11 @@
+/******************************************************\
+*        Maxime LECAT (mlecat)                         *
+*        Christophe MOHIMONT (cmohimo)                 *
+*                                                      *
+*        ce fichier contient les fonctions de creation *
+*        de semaphores                                 *
+\******************************************************/
+
 #include "semaphore.h"
 
 int createSemaphore(key_t key, int flags)

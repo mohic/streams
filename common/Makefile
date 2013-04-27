@@ -1,7 +1,7 @@
 # Maxime LECAT (mlecat)
 # Christophe MOHIMONT (cmohimo)
 #
-# compile le serveur
+# compile les fichiers communs
 
 # particularite
 .PHONY: clean
