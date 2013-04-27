@@ -19,11 +19,11 @@ CFLAGS  ?=
 PROG  = server
 
 # fichiers requis
-OBJS  = main.o serversck.o game.o ../common/semaphore.o
+OBJS  = semaphore.o
 
 # compilation
 all: $(OBJS)
-		$(CC) $(CFLAGS) $^ -o $(PROG)
+		#$(CC) $(CFLAGS) $^ -o $(PROG)
 
 %.o: %.c
 		$(CC) $(CFLAGS) -c $< -o $@

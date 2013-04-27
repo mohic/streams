@@ -8,6 +8,9 @@
 #include "serversck.h"
 #include "game.h"
 #include "../common/common.h"
+#include "../common/semaphore.h"
+
+#define SEM_KEY 12345
 
 // remarque, n'accepte que 1 client pour le moment
 
@@ -42,6 +45,9 @@ int main (int argc, char* argv[])
 	// creation de la memoire partagee
 	int shmid = shmget(SHM_KEY, sizeof(struct game), IPC_CREAT);
 	struct game *g = (struct game *)shmat(shmid, NULL, 0);
+
+	// creation du semaphore
+	int semid = createSemaphore(SEM_KEY, IPC_CREAT | IPC_EXCL);
 
 	// inscription d'un joueur
 	fd_set readfs;
@@ -84,7 +90,7 @@ int main (int argc, char* argv[])
 
 					if (recevoirMessage(sockets[i], message, sizeof(message) - 1) != -1) {
 						//printf("Message du joueur %d: %s", i + 1, message);
-						traiterMessage(sockets[i], message, g, i);
+						traiterMessage(sockets[i], message, g, i, semid);
 					}
 				}
 			}
@@ -105,10 +111,6 @@ int main (int argc, char* argv[])
 		}
 	}
 
-	// destruction de la memoire partagee
-
-	return 0;
-
 	// lecture / envois de messages
 	//while(1) {
 		//TODO boucle de jeu + gestion anti bloquant comme l'accept
@@ -118,6 +120,9 @@ int main (int argc, char* argv[])
 	for (i = 0; i < nombreJoueurActuel; i++) {
 		fermerSocket(sockets[i]);
 	}
+
+	// supprimer semaphore
+	deleteSemaphore(semid);
 
 	// detacher la memoire et la marquer comme detruite
 	shmdt(g);

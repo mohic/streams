@@ -12,4 +12,5 @@
 # compilation
 all:
 		make -C client
+		make -C common
 		make -C server
