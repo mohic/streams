@@ -3,7 +3,8 @@
 
 #include <stdio.h>
 #include <string.h>
+#include "../common/common.h"
 
-int traiterMessage(int sckClient, char *message);
+int traiterMessage(int sckClient, char *message, game *g, int joueur);
 
 #endif

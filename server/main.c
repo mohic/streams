@@ -84,7 +84,7 @@ int main (int argc, char* argv[])
 
 					if (recevoirMessage(sockets[i], message, sizeof(message) - 1) != -1) {
 						//printf("Message du joueur %d: %s", i + 1, message);
-						traiterMessage(sockets[i], message);
+						traiterMessage(sockets[i], message, g, i);
 					}
 				}
 			}
