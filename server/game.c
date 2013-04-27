@@ -11,6 +11,7 @@ int traiterMessage(int sckClient, char *message, game *g, int joueur) {
 
 			for (i = 0; i < strlen(message) - 2; i++)
 				g->nom[joueur][i] = message[i+2];
+				g->nbrJoueur++;
 			//g->nom[joueur] = message+2;
 			printf ("Nom du joueur: %s\n", g->nom[joueur]);
 			break;
