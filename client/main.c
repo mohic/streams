@@ -54,6 +54,18 @@ int main (int argc, char* argv[])
 	else
 		printf("Message d'inscription envoye\n");
 
+	if (envoyerMessage(sck, "3") == -1)
+		printf("3 rate\n");
+	else
+		printf("3 ok\n");
+
+	if (envoyerMessage(sck, "5=1234") == -1)
+		printf("5 rate\n");
+	else
+		printf("5 ok\n");
+
+	return fermerSocket(sck);
+
 	// boucle de lecture / envois de messages
 	//while (1) {
 		//TODO créer un fichier contenant la logique du jeu

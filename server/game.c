@@ -10,6 +10,7 @@
 int tuilePlacee[MAX_JOUEUR];
 
 int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid) {
+	printf("traitement\n");
 	int i;
 	if (strlen(message) <= 0)
 		return -1;

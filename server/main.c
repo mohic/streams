@@ -81,15 +81,15 @@ int main (int argc, char* argv[])
 			FD_SET(sockets[i], &readfsJoueur);
 
 		ret = select(sockets[nombreJoueurActuel - 1] + 1, &readfsJoueur, NULL, NULL, &tvJoueur);
+		printf("Lecture\n");
 
 		if (ret > 0) {
 			for (i = 0; i < nombreJoueurActuel; i++) {
 				if (FD_ISSET(sockets[i], &readfsJoueur)) {
-					//printf("Reception message joueur %d\n", i + 1);
+					printf("message\n");
 					char message[201] = {'\0'};
-
-					if (recevoirMessage(sockets[i], message, sizeof(message) - 1) != -1) {
-						//printf("Message du joueur %d: %s", i + 1, message);
+					if (recevoirMessage(sockets[i], message, sizeof(message) - 1) > 0) {
+						printf("Messsage du joueur %d: %s\n", i, message);
 						traiterMessage(sockets[i], message, g, i, semid);
 					}
 				}

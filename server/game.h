@@ -10,6 +10,7 @@
 #define __game_h__
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "../common/common.h"
 #include "../common/semaphore.h"
