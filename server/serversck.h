@@ -17,6 +17,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include <string.h>
+#include "../common/common.h"
 
 typedef struct sockaddr_in SOCKADDR_IN; // définit une structure de socket de type TCP/IP
 typedef struct sockaddr    SOCKADDR; // définit une structure de socket générique
@@ -25,6 +26,6 @@ int ouvrirSocket(unsigned short port);
 int accepterClient(int socket);
 int fermerSocket(int socket);
 int envoyerMessage(int socket, char *message);
-int recevoirMessage(int socket, char *message, int length);
+int recevoirMessage(int socket, char *message);
 
 #endif

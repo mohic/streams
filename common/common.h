@@ -12,6 +12,7 @@
 #include <sys/shm.h>
 
 #define TAILLE_NOM 20
+#define TAILLE_BUFFER 50
 #define MAX_JOUEUR 4
 #define SHM_KEY 10101
 

@@ -81,9 +81,9 @@ int envoyerMessage(int socket, char *message)
 	return result;
 }
 
-int recevoirMessage(int socket, char *message, int length)
+int recevoirMessage(int socket, char *message)
 {
-	int result = recv(socket, message, length, 0); //MSG_DONTWAIT);
+	int result = recv(socket, message, TAILLE_BUFFER, 0);
 
 	if (result == -1) {
 		perror("recv");

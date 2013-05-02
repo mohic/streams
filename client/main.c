@@ -46,7 +46,7 @@ int main (int argc, char* argv[])
 	write(STDIN_FILENO, "\n", 2);
 
 	// formater le message d'inscription
-	char msg[sizeof(nom) + 2];
+	char msg[TAILLE_BUFFER] = {'\0'};
 	sprintf(msg, "1=%s", nom);
 
 	if (envoyerMessage(sck, msg) == -1)
@@ -69,10 +69,10 @@ int main (int argc, char* argv[])
 	// boucle de lecture / envois de messages
 	//while (1) {
 		//TODO créer un fichier contenant la logique du jeu
-		char message[201] = {'\0'};
+		char message[TAILLE_BUFFER + 1] = {'\0'};
 
 		//printf("lecture message\n");
-		if (recevoirMessage(sck, message, sizeof(message)-1) != -1) {
+		if (recevoirMessage(sck, message) != -1) {
                         if (strncmp(message, "1=0", 3))
 				printf("Inscription acceptee\n");
 			else

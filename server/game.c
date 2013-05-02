@@ -10,7 +10,6 @@
 int tuilePlacee[MAX_JOUEUR];
 
 int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid) {
-	printf("traitement\n");
 	int i;
 	if (strlen(message) <= 0)
 		return -1;
@@ -18,9 +17,11 @@ int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid)
 	switch(message[0]) {
 		case '1':
 			down(semid);
-				for (i = 0; i < strlen(message) - 2; i++)
-					g->nom[joueur][i] = message[i+2];
-				g->score[joueur] = -1;	
+				for (i = 0; i < strlen(message) - 3; i++)
+					//if (message[i+2] != '\0')
+						g->nom[joueur][i] = message[i+2];
+				g->nom[joueur][i] = '\0';
+				g->score[joueur] = -1;
 				g->nbrJoueur++;
 				printf ("Nom du joueur: %s\n", g->nom[joueur]);
 			up(semid);
