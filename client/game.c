@@ -7,36 +7,40 @@
 
 #include "game.h"
 
-int tuilePlacee[MAX_JOUEUR];
+int partieCommencee = 0;
 
-int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid) {
+void listerJoueurs(game *g, int semid)
+{
 	int i;
+
+	printf("Liste des joueurs present:\n");
+	
+	down(semid);
+		for (i = 0; i < g->nbrJoueur; i++)
+			printf("Nom: %s, score: %d\n", g->nom[i], g->score[i]);
+	up(semid);
+}
+
+int traiterMessage(int sckClient, char *message, game *g, int semid)
+{
+	int i;
+
+	printf("traitement: %s\n", message); //TODO a retirer
+
 	if (strlen(message) <= 0)
 		return -1;
 
 	switch(message[0]) {
 		case '1':
-			down(semid);
-				if (g->nbrJoueur >= MAX_JOUEUR) {
-					printf("joueur refuse car maximum ateint\n");
-					envoyerMessage(sckClient, "1=0"); // previent le client qu'il est refuse de jouer
-					//TODO fermer le socket du client
-					break;
-				}
+			if (message[2] == '0')
+				printf("Le serveur a refuse votre inscription\n");
+			else
+				printf("Vous etes maintenant inscrit pour la prochaine partie\n");
 
-				for (i = 0; i < strlen(message) - 3; i++)
-						g->nom[joueur][i] = message[i+2];
-				g->nom[joueur][i] = '\0'; // eviter le '\n' final
-				g->nbrJoueur++;
-				printf ("Nom du joueur: %s\n", g->nom[joueur]);
-			up(semid);
-
-			envoyerMessage(sckClient, "1=1"); // previent le client qu'il est accepte
-			printf("joueur accepte\n");
+			listerJoueurs(g, semid);
 
 			break;
-		
-		case '3':
+		/*case '3':
 			down(semid);
 				tuilePlacee[joueur] = 1;
 				printf("Le joueur %s a placé sa tuile\n", g->nom[joueur]);
@@ -49,7 +53,7 @@ int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid)
 				g->score[joueur] = atoi(message);
 				printf("Score du joueur %s: %d\n", g->nom[joueur], g->score[joueur]); 
 			up(semid);
-			break;
+			break;*/
 
 		default:
 			printf("Message inconnu: %s\n", message);

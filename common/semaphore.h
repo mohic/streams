@@ -13,6 +13,8 @@
 #include <sys/ipc.h>
 #include <sys/sem.h>
 
+#define SEM_KEY 10102
+
 int createSemaphore(key_t key, int flags);
 int deleteSemaphore(int semid);
 int down(int semid);

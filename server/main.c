@@ -10,8 +10,6 @@
 #include "../common/common.h"
 #include "../common/semaphore.h"
 
-#define SEM_KEY 12345
-
 // remarque, n'accepte que 1 client pour le moment
 
 int main (int argc, char* argv[])
@@ -49,6 +47,15 @@ int main (int argc, char* argv[])
 	// creation du semaphore
 	int semid = createSemaphore(SEM_KEY, IPC_CREAT | IPC_EXCL);
 
+	// initialisation de la memoire partagee
+	down(semid);
+		g->nbrJoueur = 0;
+		
+		for(i = 0; i < MAX_JOUEUR; i++)
+			g->score[i] = -1;
+			g->nom[i][0] = '\0'; // dit juste que la chaine est vide sans effacer le reste
+	up(semid);
+
 	// inscription d'un joueur
 	fd_set readfs;
 	struct timeval tv;
@@ -82,14 +89,34 @@ int main (int argc, char* argv[])
 
 		ret = select(sockets[nombreJoueurActuel - 1] + 1, &readfsJoueur, NULL, NULL, &tvJoueur);
 
+		int sckASupprime[nombreJoueurActuel];
+
 		if (ret > 0) {
 			for (i = 0; i < nombreJoueurActuel; i++) {
+				sckASupprime[i] = 0;
+
 				if (FD_ISSET(sockets[i], &readfsJoueur)) {;
 					char message[TAILLE_BUFFER + 1] = {'\0'};
-					if (recevoirMessage(sockets[i], message) > 0) {
+					int val = recevoirMessage(sockets[i], message);
+
+					if (val > 0) {
 						traiterMessage(sockets[i], message, g, i, semid);
+					} else if (val == 0) {
+						down(semid);
+							printf("Perte de connexion avec le joueur %s\n", g->nom[i]);
+						up(semid);
+						
+						sckASupprime[i] = 1;
+						fermerSocket(sockets[i]);
 					}
 				}
+			}
+		}
+
+		// retirer les sockets sans connexion de la liste de joueur et tout replacer au debut
+		for (i = 0; i < nombreJoueurActuel; i++) {
+			if (sckASupprime[i]) { // le socket est marque comme a supprime
+				//TODO
 			}
 		}
 
@@ -103,15 +130,18 @@ int main (int argc, char* argv[])
 			continue;
 		} else {
 			printf("Nouveau joueur présent\n");
-			sockets[nombreJoueurActuel] = accepterClient(sck);
+			int sckClient = accepterClient(sck);
+
+			if (nombreJoueurActuel >= MAX_JOUEUR) {
+				envoyerMessage(sckClient, "1=0"); // inscription refusee
+				fermerSocket(sckClient); // fermer le socket
+				continue;
+			}
+
+			sockets[nombreJoueurActuel] = sckClient;
 			nombreJoueurActuel++;
 		}
 	}
-
-	// lecture / envois de messages
-	//while(1) {
-		//TODO boucle de jeu + gestion anti bloquant comme l'accept
-	//}
 
 	// fermer les sockets clients
 	for (i = 0; i < nombreJoueurActuel; i++) {

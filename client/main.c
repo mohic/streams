@@ -5,6 +5,9 @@
 	ce fichier contient la fonction main démarrant le programme client
 */
 #include "clientsck.h"
+#include "../common/common.h"
+#include "../common/semaphore.h"
+#include "game.h"
 
 //TODO remplacer printf par write
 
@@ -49,38 +52,63 @@ int main (int argc, char* argv[])
 	char msg[TAILLE_BUFFER] = {'\0'};
 	sprintf(msg, "1=%s", nom);
 
-	if (envoyerMessage(sck, msg) == -1)
+	if (envoyerMessage(sck, msg) == -1) {
 		printf("erreur envois\n");
-	else
+		return 1;
+	} else
 		printf("Message d'inscription envoye\n");
 
-	if (envoyerMessage(sck, "3") == -1)
-		printf("3 rate\n");
-	else
-		printf("3 ok\n");
+	// creer semaphore
+	int semid = createSemaphore(SEM_KEY, IPC_CREAT);
 
-	if (envoyerMessage(sck, "5=1234") == -1)
-		printf("5 rate\n");
-	else
-		printf("5 ok\n");
+	if (semid == -1) {
+		printf("Impossible d'obtenir la semaphore\n");
+		return 1;
+	}
 
-	return fermerSocket(sck);
+	// obtention de la memoire partagee
+	int shmid = shmget(SHM_KEY, sizeof(struct game), 0444);
+
+	if (shmid == -1) {
+		printf("Impossible d'obtenir la memoire partagee\n");
+		return 1;
+	}
+
+	struct game *g = (struct game *)shmat(shmid, NULL, 0);
 
 	// boucle de lecture / envois de messages
-	//while (1) {
-		//TODO créer un fichier contenant la logique du jeu
-		char message[TAILLE_BUFFER + 1] = {'\0'};
+	while (1) {
+		int ret = 0;
+		fd_set readfs;
+		struct timeval tv;
 
-		//printf("lecture message\n");
-		if (recevoirMessage(sck, message) != -1) {
-                        if (strncmp(message, "1=0", 3))
-				printf("Inscription acceptee\n");
-			else
-				printf("Inscription refusee\n");
-                }
+		tv.tv_sec = 0;
+		tv.tv_usec = 5;
 
-                printf("\n");
-	//}
+		FD_ZERO(&readfs);
+
+		FD_SET(sck, &readfs);
+
+		ret = select(sck + 1, &readfs, NULL, NULL, &tv);
+
+		if (ret > 0 && FD_ISSET(sck, &readfs)) {
+			char message[TAILLE_BUFFER + 1] = {'\0'};
+
+			int val = recevoirMessage(sck, message);
+			if (val > 0)
+				traiterMessage(sck, message, g, semid);
+			else if (val == 0) {
+				printf("Perte de connexion avec le serveur\n");
+				break; // quitter la boucle
+			}
+		}
+	}
+
+	// detacher la memoire
+	shmdt(g);
+
+	// fermeture du semaphore
+	deleteSemaphore(semid);
 
 	// ferneture de la socket
 	return fermerSocket(sck);

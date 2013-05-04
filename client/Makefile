@@ -19,7 +19,7 @@ CFLAGS  ?=
 PROG  = client
 
 # fichiers requis
-OBJS  = main.o clientsck.o
+OBJS  = main.o clientsck.o ../common/semaphore.o game.o
 
 # compilation
 all: $(OBJS)
