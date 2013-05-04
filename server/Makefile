@@ -16,7 +16,7 @@ CC      ?= gcc
 CFLAGS  ?=
 
 # nom du prog
-PROG  = server
+PROG  = server.out
 
 # fichiers requis
 OBJS  = main.o serversck.o game.o ../common/semaphore.o

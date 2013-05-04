@@ -16,7 +16,7 @@ CC      ?= gcc
 CFLAGS  ?=
 
 # nom du prog
-PROG  = client
+PROG  = client.out
 
 # fichiers requis
 OBJS  = main.o clientsck.o ../common/semaphore.o game.o
