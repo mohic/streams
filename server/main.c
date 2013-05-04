@@ -70,6 +70,8 @@ int main (int argc, char* argv[])
 
 	//TODO timer 30 secondes (voir avec signal)
 
+	printf("Appuyer sur CTRL+D pour quitter le serveur\n");
+
 	while(1) {
 		int ret = 0;
 
@@ -77,17 +79,13 @@ int main (int argc, char* argv[])
 		tv.tv_usec = 0;
 
 		fd_set readfsJoueur;
-		struct timeval tvJoueur;
-
-		tvJoueur.tv_sec = 0;
-		tvJoueur.tv_usec = 5;
 
 		FD_ZERO(&readfsJoueur);
 
 		for (i = 0; i < nombreJoueurActuel; i++)
 			FD_SET(sockets[i], &readfsJoueur);
 
-		ret = select(sockets[nombreJoueurActuel - 1] + 1, &readfsJoueur, NULL, NULL, &tvJoueur);
+		ret = select(sockets[nombreJoueurActuel - 1] + 1, &readfsJoueur, NULL, NULL, &tv);
 
 		int sckASupprime[nombreJoueurActuel];
 
@@ -114,21 +112,22 @@ int main (int argc, char* argv[])
 		}
 
 		// retirer les sockets sans connexion de la liste de joueur et tout replacer au debut
-		for (i = 0; i < nombreJoueurActuel; i++) {
+		/*for (i = 0; i < nombreJoueurActuel; i++) {
 			if (sckASupprime[i]) { // le socket est marque comme a supprime
 				//TODO
 			}
-		}
+		}*/
 
 		FD_ZERO(&readfs);
 		FD_SET(sck, &readfs);
+
+		tv.tv_sec = 1;
+		tv.tv_usec = 0;
 		
 		if ((ret = select(sck + 1, &readfs, NULL, NULL, &tv)) < 0) {
 			perror("select");
 			return 1;
-		} else if (ret == 0) {
-			continue;
-		} else {
+		} else if (ret > 0) {
 			printf("Nouveau joueur présent\n");
 			int sckClient = accepterClient(sck);
 
@@ -140,6 +139,28 @@ int main (int argc, char* argv[])
 
 			sockets[nombreJoueurActuel] = sckClient;
 			nombreJoueurActuel++;
+		}
+
+		tv.tv_sec = 1;
+		tv.tv_usec = 0;
+
+		FD_ZERO(&readfs);
+		FD_SET(STDIN_FILENO, &readfs);
+
+		if ((ret = select(STDIN_FILENO + 1, &readfs, NULL, NULL, &tv)) < 0) {
+			perror("select");
+			return 1;
+		} else if (ret > 0) {
+			char msg[3] = {'\0'};
+			int size = read(STDIN_FILENO, msg, 2);
+
+			if (size > 0) {
+				while(read(STDIN_FILENO, NULL, 80) > 0);
+			}
+
+			if (size == 0) // si ctrl-D alors quitter le server
+				//TODO annuler la partie
+				break;
 		}
 	}
 
