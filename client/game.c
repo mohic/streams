@@ -72,7 +72,7 @@ int traiterMessage(int sckClient, char *message, game *g, int semid)
 
 void placerTuiles(int tuile) {
 		
-	printf("Veuilliez encoder son emplacement");
+	printf("Veuilliez encoder son emplacement: ");
 	int placement;
 	scanf("%d", &placement);
 	tuiles[placement] = tuile;
@@ -82,7 +82,7 @@ void placerTuiles(int tuile) {
 int calculerScore() {
 
 	//suite placé à 1 car on a d'office une suite de 1 au premier
-	int suite = 1;
+	int suite = 0;
 	int score = 0;
 	int tableauPoints[20] = {0, 1, 3, 5, 7, 9, 11, 15, 20, 25, 30, 35, 40, 50, 60, 70, 85, 100, 150, 300};
 	
@@ -102,7 +102,7 @@ int calculerScore() {
 		//si la tuile est plus petite que la précédente
 		} else {
 			score = score + tableauPoints[suite];
-			suite = 1;
+			suite = 0;
 		}
 	}
 
