@@ -7,7 +7,12 @@
 
 #include "game.h"
 
+int tuiles[40];
+int nbrRestant;
 int tuilePlacee[MAX_JOUEUR];
+
+//int scks[];
+//int tailleScks;
 
 int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid, int aDemarre) {
 	int i;
@@ -44,12 +49,23 @@ int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid,
 			break;
 		
 		case '3':
+			tuilePlacee[joueur] = 1;
+
 			down(semid);
-				tuilePlacee[joueur] = 1;
 				printf("Le joueur %s a placé sa tuile\n", g->nom[joueur]);
+
+			int ontTousPlace = 1;
+
+			for (i = 0; i < g->nbrJoueur; i++)
+				if (!tuilePlacee[i])
+					ontTousPlace = 0;
 			up(semid);
+
+			//TODO piocher le suivant
+			//if (ontTousPlace)
+			//	piocherTuile(scks, tailleScks);
+
 			break;
-		
 		case '5':
 			down(semid);
 				message += 2;
@@ -64,4 +80,53 @@ int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid,
 	}
 
 	return 0;
+}
+
+void piocherTuile(int sockets[], int taille)
+{
+	int i;
+
+	int posTuile = rand() % nbrRestant;
+
+	char msg[5] = {'\0'};
+	sprintf(msg, "3=%d", tuiles[posTuile]);
+
+	printf("Tuile piochee: %d\n", tuiles[posTuile]);
+
+	tuiles[posTuile] = tuiles[nbrRestant - 1];
+	nbrRestant--;
+
+	for(i = 0; i < taille; i++)
+		envoyerMessage(sockets[i], msg);
+}
+
+void demarrerPartie(int sockets[], int taille)
+{
+	int i;
+
+	//scks = sockets;
+	//tailleScks = taille;
+
+	printf("La partie commence\n");
+
+	// initialise le generateur de nombre pseudo-aleatoire
+	srand(time(NULL));
+
+	for (i = 0; i < 10; i++) // creer les tuiles de 1 a 10
+		tuiles[i] = i + 1;
+
+	for (i = 0; i < 18; i += 2) { // creer les tuiles de 11 a 19
+		tuiles[i + 10] = i + 11;
+		tuiles[i + 11] = i + 11;
+	}
+
+	for (i = 0; i < 9; i++) // creer les tuiles de 20 a 30
+		tuiles[i + 29] = i + 20;
+
+	tuiles[39] = 0; // creer le joker (represente sous la valeur de 0 en memoire)
+
+	nbrRestant = 40;
+
+	// demarrer le jeu en piochant la 1ere tuile
+	piocherTuile(sockets, taille);
 }

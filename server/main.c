@@ -93,8 +93,8 @@ int main (int argc, char* argv[])
 	while(1) {
 		down(semid);
 			if (!gameStarted && timeElapsed && g->nbrJoueur >= 2) {
-				printf("La partie commence\n");
 				gameStarted = 1;
+				demarrerPartie(sockets, nombreJoueurActuel);
 			}
 		up(semid);
 

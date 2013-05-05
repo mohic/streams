@@ -7,8 +7,6 @@
 
 #include "game.h"
 
-int partieCommencee = 0;
-
 void listerJoueurs(game *g, int semid)
 {
 	int i;
@@ -24,8 +22,6 @@ void listerJoueurs(game *g, int semid)
 int traiterMessage(int sckClient, char *message, game *g, int semid)
 {
 	int i;
-
-	printf("traitement: %s\n", message); //TODO a retirer
 
 	if (strlen(message) <= 0)
 		return -1;
@@ -43,14 +39,12 @@ int traiterMessage(int sckClient, char *message, game *g, int semid)
 		case '2':
 			printf("La partie est annulee\n");
 			return 2;
-		/*case '3':
-			down(semid);
-				tuilePlacee[joueur] = 1;
-				printf("Le joueur %s a placé sa tuile\n", g->nom[joueur]);
-			up(semid);
+		case '3':
+			printf("La tuile est piochee: %c\n", message[2]);
+			//TODO
 			break;
 		
-		case '5':
+		/*case '5':
 			down(semid);
 				message += 2;
 				g->score[joueur] = atoi(message);
