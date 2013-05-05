@@ -5,16 +5,32 @@
 *        ce fichier contient la fonction main démarrant le programme serveur *
 \****************************************************************************/
 
+#include <signal.h>
 #include "serversck.h"
 #include "game.h"
 #include "../common/common.h"
 #include "../common/semaphore.h"
 
-// remarque, n'accepte que 1 client pour le moment
+#define TEMPS_ATTENTE 10
+
+int gameStarted;
+int timeElapsed;
+
+void startgame(int sig)
+{
+	if (sig == SIGALRM) {
+		printf("Le temps minimum de %d secondes est passe\n", TEMPS_ATTENTE);
+		timeElapsed = 1;
+	}
+}
 
 int main (int argc, char* argv[])
 {
 	int i;
+
+	// init
+	gameStarted = 0;
+	timeElapsed = 0;
 
 	// vérification # arguments
 	if (argc <= 1 || argc >= 3) {
@@ -68,15 +84,24 @@ int main (int argc, char* argv[])
 
 	sockets[nombreJoueurActuel++] = accepterClient(sck);
 
-	//TODO timer 30 secondes (voir avec signal)
-
 	printf("Appuyer sur CTRL+D pour quitter le serveur\n");
 
+	// demarrer le timer
+	signal(SIGALRM, startgame);
+	alarm(TEMPS_ATTENTE);
+
 	while(1) {
+		down(semid);
+			if (!gameStarted && timeElapsed && g->nbrJoueur >= 2) {
+				printf("La partie commence\n");
+				gameStarted = 1;
+			}
+		up(semid);
+
 		int ret = 0;
 
-		tv.tv_sec = 1;
-		tv.tv_usec = 0;
+		tv.tv_sec = 0;
+		tv.tv_usec = 5000;
 
 		fd_set readfsJoueur;
 
@@ -98,7 +123,7 @@ int main (int argc, char* argv[])
 					int val = recevoirMessage(sockets[i], message);
 
 					if (val > 0) {
-						traiterMessage(sockets[i], message, g, i, semid);
+						traiterMessage(sockets[i], message, g, i, semid, gameStarted);
 					} else if (val == 0) {
 						down(semid);
 							printf("Perte de connexion avec le joueur %s\n", g->nom[i]);
@@ -121,18 +146,22 @@ int main (int argc, char* argv[])
 		FD_ZERO(&readfs);
 		FD_SET(sck, &readfs);
 
-		tv.tv_sec = 1;
-		tv.tv_usec = 0;
+		tv.tv_sec = 0;
+		tv.tv_usec = 5000;
 		
 		if ((ret = select(sck + 1, &readfs, NULL, NULL, &tv)) < 0) {
+			if (errno == EINTR) // erreur provoquee par le timer
+				continue;
+
 			perror("select");
 			return 1;
 		} else if (ret > 0) {
 			printf("Nouveau joueur présent\n");
 			int sckClient = accepterClient(sck);
 
-			if (nombreJoueurActuel >= MAX_JOUEUR) {
+			if (nombreJoueurActuel >= MAX_JOUEUR || gameStarted) {
 				envoyerMessage(sckClient, "1=0"); // inscription refusee
+				printf("inscription refusee\n");
 				fermerSocket(sckClient); // fermer le socket
 				continue;
 			}
@@ -141,13 +170,16 @@ int main (int argc, char* argv[])
 			nombreJoueurActuel++;
 		}
 
-		tv.tv_sec = 1;
-		tv.tv_usec = 0;
+		tv.tv_sec = 0;
+		tv.tv_usec = 5000;
 
 		FD_ZERO(&readfs);
 		FD_SET(STDIN_FILENO, &readfs);
 
 		if ((ret = select(STDIN_FILENO + 1, &readfs, NULL, NULL, &tv)) < 0) {
+			if (errno == EINTR) // erreur provoquee par le timer
+				continue;
+
 			perror("select");
 			return 1;
 		} else if (ret > 0) {

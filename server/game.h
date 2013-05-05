@@ -15,6 +15,6 @@
 #include "../common/common.h"
 #include "../common/semaphore.h"
 
-int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid);
+int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid, int aDemarre);
 
 #endif

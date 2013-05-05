@@ -9,13 +9,20 @@
 
 int tuilePlacee[MAX_JOUEUR];
 
-int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid) {
+int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid, int aDemarre) {
 	int i;
 	if (strlen(message) <= 0)
 		return -1;
 
 	switch(message[0]) {
 		case '1':
+			if (aDemarre) {
+				printf("joueur refuse car partie deja commencee\n");
+				envoyerMessage(sckClient, "1=0");
+				//TODO fermer le socket client
+				break;
+			}
+
 			down(semid);
 				if (g->nbrJoueur >= MAX_JOUEUR) {
 					printf("joueur refuse car maximum ateint\n");

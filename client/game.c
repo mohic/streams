@@ -40,6 +40,9 @@ int traiterMessage(int sckClient, char *message, game *g, int semid)
 			listerJoueurs(g, semid);
 
 			break;
+		case '2':
+			printf("La partie est annulee\n");
+			return 2;
 		/*case '3':
 			down(semid);
 				tuilePlacee[joueur] = 1;

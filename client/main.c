@@ -95,11 +95,14 @@ int main (int argc, char* argv[])
 			char message[TAILLE_BUFFER + 1] = {'\0'};
 
 			int val = recevoirMessage(sck, message);
-			if (val > 0)
-				traiterMessage(sck, message, g, semid);
-			else if (val == 0) {
+			if (val > 0) {
+				int valTraitement = traiterMessage(sck, message, g, semid);
+
+				if (valTraitement == 2)
+					break;
+			} else if (val == 0) {
 				printf("Perte de connexion avec le serveur\n");
-				break; // quitter la boucle
+				break;
 			}
 		}
 	}
