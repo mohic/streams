@@ -11,8 +11,8 @@ int tuiles[40];
 int nbrRestant;
 int tuilePlacee[MAX_JOUEUR];
 
-//int scks[];
-//int tailleScks;
+int scks[MAX_JOUEUR];
+int tailleScks;
 
 int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid, int aDemarre) {
 	int i;
@@ -62,8 +62,11 @@ int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid,
 			up(semid);
 
 			//TODO piocher le suivant
-			//if (ontTousPlace)
-			//	piocherTuile(scks, tailleScks);
+			if (ontTousPlace)
+				piocherTuile(scks, tailleScks);
+			else if (nbrRestant == 0) { // fin de la partie
+				finPartie(scks, tailleScks);
+			}
 
 			break;
 		case '5':
@@ -82,11 +85,23 @@ int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid,
 	return 0;
 }
 
+void finPartie(int sockets[], int taille)
+{
+	int i;
+
+	printf("Fin de la partie. En attente du score des joueurs\n");
+
+	for (i = 0; i < taille; i++)
+		envoyerMessage(sockets[i], "4");
+}
+
 void piocherTuile(int sockets[], int taille)
 {
 	int i;
 
 	int posTuile = rand() % nbrRestant;
+
+	printf("posTuile=%d\n", posTuile);
 
 	char msg[5] = {'\0'};
 	sprintf(msg, "3=%d", tuiles[posTuile]);
@@ -96,16 +111,22 @@ void piocherTuile(int sockets[], int taille)
 	tuiles[posTuile] = tuiles[nbrRestant - 1];
 	nbrRestant--;
 
+	printf("1\n");
+
 	for(i = 0; i < taille; i++)
 		envoyerMessage(sockets[i], msg);
+
+	printf("2\n");
 }
 
 void demarrerPartie(int sockets[], int taille)
 {
 	int i;
 
-	//scks = sockets;
-	//tailleScks = taille;
+	for (i = 0; i < taille; i++)
+		scks[i] = sockets[i];
+	
+	tailleScks = taille;
 
 	printf("La partie commence\n");
 
@@ -115,15 +136,19 @@ void demarrerPartie(int sockets[], int taille)
 	for (i = 0; i < 10; i++) // creer les tuiles de 1 a 10
 		tuiles[i] = i + 1;
 
-	for (i = 0; i < 18; i += 2) { // creer les tuiles de 11 a 19
+	for (i = 0; i < 9; i ++) // creer les tuiles de 11 a 19
 		tuiles[i + 10] = i + 11;
-		tuiles[i + 11] = i + 11;
-	}
 
-	for (i = 0; i < 9; i++) // creer les tuiles de 20 a 30
-		tuiles[i + 29] = i + 20;
+	for (i = 0; i < 9; i++) // creer les tuiles de 11 a 19 (doublon)
+		tuiles[i + 19] = i + 11;
+
+	for (i = 0; i < 11; i++) // creer les tuiles de 20 a 30
+		tuiles[i + 28] = i + 20;
 
 	tuiles[39] = 0; // creer le joker (represente sous la valeur de 0 en memoire)
+
+	for (i = 0; i < 40; i++)
+		printf("tuile %d = %d\n", i, tuiles[i]);
 
 	nbrRestant = 40;
 

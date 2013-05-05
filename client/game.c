@@ -40,8 +40,10 @@ int traiterMessage(int sckClient, char *message, game *g, int semid)
 			printf("La partie est annulee\n");
 			return 2;
 		case '3':
-			printf("La tuile est piochee: %c\n", message[2]);
+			message += 2;
+			printf("La tuile est piochee: %s\n", message);
 			//TODO
+			envoyerMessage(sckClient, "3");
 			break;
 		
 		/*case '5':

@@ -1,0 +1,1 @@
+- bug lorsque deux client se connecte et que le 2eme entre son nom avant le premier
