@@ -54,7 +54,7 @@ int accepterClient(int socket) {
 		return -1;
 	}
 
-	printf("Le client %d vient de se connecter\n", sckClient);
+	printf("Le client avec le socket: %d vient de se connecter\n", sckClient);
 
 	return sckClient;
 }
