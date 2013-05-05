@@ -42,10 +42,17 @@ int traiterMessage(int sckClient, char *message, game *g, int semid)
 		case '3':
 			message += 2;
 			printf("La tuile est piochee: %s\n", message);
-			//TODO
+			//TODO positioner tuile
 			envoyerMessage(sckClient, "3");
 			break;
-		
+		case '4':
+			printf("Fin de la partie\n");
+
+			//TODO calculer score
+
+			envoyerMessage(sckClient, "4=1234");
+
+			break;
 		/*case '5':
 			down(semid);
 				message += 2;

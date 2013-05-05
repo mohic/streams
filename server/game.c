@@ -8,6 +8,7 @@
 #include "game.h"
 
 int tuiles[40];
+int tour;
 int nbrRestant;
 int tuilePlacee[MAX_JOUEUR];
 
@@ -16,6 +17,9 @@ int tailleScks;
 
 int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid, int aDemarre) {
 	int i;
+
+	printf("traitement: %s\n", message);
+
 	if (strlen(message) <= 0)
 		return -1;
 
@@ -61,12 +65,10 @@ int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid,
 					ontTousPlace = 0;
 			up(semid);
 
-			//TODO piocher le suivant
-			if (ontTousPlace)
-				piocherTuile(scks, tailleScks);
-			else if (nbrRestant == 0) { // fin de la partie
+			if (ontTousPlace && tour <= 0) // fin partie
 				finPartie(scks, tailleScks);
-			}
+			else if (ontTousPlace) // piocher le suivant
+				piocherTuile(scks, tailleScks);
 
 			break;
 		case '5':
@@ -98,10 +100,10 @@ void finPartie(int sockets[], int taille)
 void piocherTuile(int sockets[], int taille)
 {
 	int i;
+	int posTuile = 0;
 
-	int posTuile = rand() % nbrRestant;
-
-	printf("posTuile=%d\n", posTuile);
+	if (nbrRestant > 0)
+		posTuile = rand() % nbrRestant;
 
 	char msg[5] = {'\0'};
 	sprintf(msg, "3=%d", tuiles[posTuile]);
@@ -110,13 +112,10 @@ void piocherTuile(int sockets[], int taille)
 
 	tuiles[posTuile] = tuiles[nbrRestant - 1];
 	nbrRestant--;
-
-	printf("1\n");
+	tour--;
 
 	for(i = 0; i < taille; i++)
 		envoyerMessage(sockets[i], msg);
-
-	printf("2\n");
 }
 
 void demarrerPartie(int sockets[], int taille)
@@ -127,6 +126,8 @@ void demarrerPartie(int sockets[], int taille)
 		scks[i] = sockets[i];
 	
 	tailleScks = taille;
+
+	tour = 20;
 
 	printf("La partie commence\n");
 
