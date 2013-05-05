@@ -59,7 +59,7 @@ int main (int argc, char* argv[])
 		printf("Message d'inscription envoye\n");
 
 	// creer semaphore
-	int semid = createSemaphore(SEM_KEY, IPC_CREAT);
+	int semid = createSemaphore(SEM_KEY, IPC_CREAT | 0666);
 
 	if (semid == -1) {
 		printf("Impossible d'obtenir la semaphore\n");

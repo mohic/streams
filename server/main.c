@@ -28,6 +28,14 @@ int main (int argc, char* argv[])
 {
 	int i;
 
+	// creation du semaphore
+	int semid = createSemaphore(SEM_KEY, IPC_CREAT | IPC_EXCL | 0666);
+	
+	if (semid == -1) {
+		printf("Une instance du serveur est deja demaree\n");
+		return 0;
+	}
+
 	// init
 	gameStarted = 0;
 	timeElapsed = 0;
@@ -57,11 +65,8 @@ int main (int argc, char* argv[])
 	printf("Serveur en écoute sur le port %d\n", port);
 
 	// creation de la memoire partagee
-	int shmid = shmget(SHM_KEY, sizeof(struct game), IPC_CREAT);
+	int shmid = shmget(SHM_KEY, sizeof(struct game), IPC_CREAT | 0666);
 	struct game *g = (struct game *)shmat(shmid, NULL, 0);
-
-	// creation du semaphore
-	int semid = createSemaphore(SEM_KEY, IPC_CREAT | IPC_EXCL);
 
 	// initialisation de la memoire partagee
 	down(semid);
@@ -125,7 +130,8 @@ int main (int argc, char* argv[])
 					int val = recevoirMessage(sockets[i], message);
 
 					if (val > 0) {
-						traiterMessage(sockets[i], message, g, i, semid, gameStarted);
+						if (traiterMessage(sockets[i], message, g, i, semid, gameStarted) == -1)
+							break;
 					} else if (val == 0) {
 						down(semid);
 							printf("Perte de connexion avec le joueur %s\n", g->nom[i]);
