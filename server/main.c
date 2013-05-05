@@ -28,6 +28,14 @@ int main (int argc, char* argv[])
 {
 	int i;
 
+	for (i = 1; i < argc; i++) {
+		if (strncmp(argv[i], "-f", 2) == 0) {
+			printf("Netoyage semaphore\n");
+			int semid = createSemaphore(SEM_KEY, IPC_CREAT | 0666);
+			deleteSemaphore(semid);
+		}
+	}
+
 	// creation du semaphore
 	int semid = createSemaphore(SEM_KEY, IPC_CREAT | IPC_EXCL | 0666);
 	
@@ -41,8 +49,8 @@ int main (int argc, char* argv[])
 	timeElapsed = 0;
 
 	// vérification # arguments
-	if (argc <= 1 || argc >= 3) {
-		printf("Usage: %s port [fichierErreur]\n", argv[0]);
+	if (argc <= 1 || argc >= 4) {
+		printf("Usage: %s port [fichierErreur] [-f]\n", argv[0]);
 		return 1;
 	}
 
