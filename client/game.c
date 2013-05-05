@@ -50,7 +50,7 @@ int traiterMessage(int sckClient, char *message, game *g, int semid)
 
 			//TODO calculer score
 
-			envoyerMessage(sckClient, "4=1234");
+			envoyerMessage(sckClient, "5=1234");
 
 			break;
 		/*case '5':
@@ -77,7 +77,6 @@ void placerTuiles(int *cases, int tuile) {
 	cases[placement] = tuile;
 	
 }
-
 
 int calculerScore(int *cases) {
 
@@ -108,12 +107,4 @@ int calculerScore(int *cases) {
 
 	return score;
 }
-
-
-
-
-
-
-
-
 

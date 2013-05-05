@@ -92,11 +92,13 @@ int main (int argc, char* argv[])
 
 	while(1) {
 		down(semid);
-			if (!gameStarted && timeElapsed && g->nbrJoueur >= 2) {
-				gameStarted = 1;
-				demarrerPartie(sockets, nombreJoueurActuel);
-			}
+			int nbr = g->nbrJoueur;
 		up(semid);
+		
+		if (!gameStarted && timeElapsed && g->nbrJoueur >= 2) {
+			gameStarted = 1;
+			demarrerPartie(sockets, nombreJoueurActuel, g, semid);
+		}
 
 		int ret = 0;
 

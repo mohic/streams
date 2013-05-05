@@ -18,8 +18,6 @@ int tailleScks;
 int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid, int aDemarre) {
 	int i;
 
-	printf("traitement: %s\n", message);
-
 	if (strlen(message) <= 0)
 		return -1;
 
@@ -66,9 +64,9 @@ int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid,
 			up(semid);
 
 			if (ontTousPlace && tour <= 0) // fin partie
-				finPartie(scks, tailleScks);
+				finPartie(scks, tailleScks, g, semid);
 			else if (ontTousPlace) // piocher le suivant
-				piocherTuile(scks, tailleScks);
+				piocherTuile(scks, tailleScks, g, semid);
 
 			break;
 		case '5':
@@ -87,7 +85,7 @@ int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid,
 	return 0;
 }
 
-void finPartie(int sockets[], int taille)
+void finPartie(int sockets[], int taille, game *g, int semid)
 {
 	int i;
 
@@ -97,7 +95,7 @@ void finPartie(int sockets[], int taille)
 		envoyerMessage(sockets[i], "4");
 }
 
-void piocherTuile(int sockets[], int taille)
+void piocherTuile(int sockets[], int taille, game *g, int semid)
 {
 	int i;
 	int posTuile = 0;
@@ -114,11 +112,17 @@ void piocherTuile(int sockets[], int taille)
 	nbrRestant--;
 	tour--;
 
-	for(i = 0; i < taille; i++)
+	// reset tuile placee
+	down(semid);
+		for (i = 0; i < g->nbrJoueur; i++)
+			tuilePlacee[i] = 0;
+	up(semid);
+
+	for (i = 0; i < taille; i++)
 		envoyerMessage(sockets[i], msg);
 }
 
-void demarrerPartie(int sockets[], int taille)
+void demarrerPartie(int sockets[], int taille, game *g, int semid)
 {
 	int i;
 
@@ -151,5 +155,5 @@ void demarrerPartie(int sockets[], int taille)
 	nbrRestant = 40;
 
 	// demarrer le jeu en piochant la 1ere tuile
-	piocherTuile(sockets, taille);
+	piocherTuile(sockets, taille, g, semid);
 }
