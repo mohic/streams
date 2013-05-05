@@ -118,7 +118,7 @@ int main (int argc, char* argv[])
 			for (i = 0; i < nombreJoueurActuel; i++) {
 				sckASupprime[i] = 0;
 
-				if (FD_ISSET(sockets[i], &readfsJoueur)) {;
+				if (FD_ISSET(sockets[i], &readfsJoueur)) {
 					char message[TAILLE_BUFFER + 1] = {'\0'};
 					int val = recevoirMessage(sockets[i], message);
 
@@ -129,6 +129,7 @@ int main (int argc, char* argv[])
 							printf("Perte de connexion avec le joueur %s\n", g->nom[i]);
 						up(semid);
 						
+						nombreJoueurActuel--;
 						sckASupprime[i] = 1;
 						fermerSocket(sockets[i]);
 					}
