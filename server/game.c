@@ -147,9 +147,6 @@ void demarrerPartie(int sockets[], int taille)
 
 	tuiles[39] = 0; // creer le joker (represente sous la valeur de 0 en memoire)
 
-	for (i = 0; i < 40; i++)
-		printf("tuile %d = %d\n", i, tuiles[i]);
-
 	nbrRestant = 40;
 
 	// demarrer le jeu en piochant la 1ere tuile
