@@ -17,5 +17,6 @@
 
 void listerJoueurs(game *g, int semid);
 int traiterMessage(int sckClient, char *message, game *g, int semid);
+int calculerScore(int *cases);
 
 #endif
