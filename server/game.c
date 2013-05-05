@@ -17,6 +17,7 @@ int tailleScks;
 
 int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid, int aDemarre) {
 	int i;
+	int ontTousPlace;
 
 	if (strlen(message) <= 0)
 		return -1;
@@ -56,11 +57,13 @@ int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid,
 			down(semid);
 				printf("Le joueur %s a placé sa tuile\n", g->nom[joueur]);
 
-			int ontTousPlace = 1;
+				ontTousPlace = 1;
 
-			for (i = 0; i < g->nbrJoueur; i++)
-				if (!tuilePlacee[i])
-					ontTousPlace = 0;
+				for (i = 0; i < g->nbrJoueur; i++)
+					if (!tuilePlacee[i]) {
+						ontTousPlace = 0;
+						break;
+					}
 			up(semid);
 
 			if (ontTousPlace && tour <= 0) // fin partie
@@ -70,11 +73,24 @@ int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid,
 
 			break;
 		case '5':
+			tuilePlacee[joueur] = 1;
+
 			down(semid);
 				message += 2;
 				g->score[joueur] = atoi(message);
-				printf("Score du joueur %s: %d\n", g->nom[joueur], g->score[joueur]); 
+				printf("Score du joueur %s: %d\n", g->nom[joueur], g->score[joueur]);
+
+				ontTousPlace = 1;
+
+				for(i = 0; i < g->nbrJoueur; i++)
+					if (!tuilePlacee[i]) {
+						ontTousPlace = 0;
+						break;
+					}
 			up(semid);
+
+			if (ontTousPlace)
+				finJeu(g, semid);
 			break;
 
 		default:
@@ -85,11 +101,29 @@ int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid,
 	return 0;
 }
 
+void finJeu(game *g, int semid)
+{
+	down(semid);
+		printf("La gagnant est: %s\n", g->nom[0]); //TODO
+	up(semid);
+
+	int i;
+
+	for (i = 0; i < tailleScks; i++)
+		envoyerMessage(scks[i], "5");
+}
+
 void finPartie(int sockets[], int taille, game *g, int semid)
 {
 	int i;
 
 	printf("Fin de la partie. En attente du score des joueurs\n");
+
+	// reset tuile placee (utilisee pour savoir si tout les scores ont ete recus)
+	down(semid);
+		for (i = 0; i < g->nbrJoueur; i++)
+			tuilePlacee[i] = 0;
+	up(semid);
 
 	for (i = 0; i < taille; i++)
 		envoyerMessage(sockets[i], "4");

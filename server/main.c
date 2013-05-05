@@ -127,12 +127,8 @@ int main (int argc, char* argv[])
 
 		ret = select(sockets[nombreJoueurActuel - 1] + 1, &readfsJoueur, NULL, NULL, &tv);
 
-		int sckASupprime[nombreJoueurActuel];
-
 		if (ret > 0) {
 			for (i = 0; i < nombreJoueurActuel; i++) {
-				sckASupprime[i] = 0;
-
 				if (FD_ISSET(sockets[i], &readfsJoueur)) {
 					char message[TAILLE_BUFFER + 1] = {'\0'};
 					int val = recevoirMessage(sockets[i], message);
@@ -145,20 +141,12 @@ int main (int argc, char* argv[])
 							printf("Perte de connexion avec le joueur %s\n", g->nom[i]);
 						up(semid);
 						
-						nombreJoueurActuel--;
-						sckASupprime[i] = 1;
 						fermerSocket(sockets[i]);
+						sockets[i] = -1;
 					}
 				}
 			}
 		}
-
-		// retirer les sockets sans connexion de la liste de joueur et tout replacer au debut
-		/*for (i = 0; i < nombreJoueurActuel; i++) {
-			if (sckASupprime[i]) { // le socket est marque comme a supprime
-				//TODO
-			}
-		}*/
 
 		FD_ZERO(&readfs);
 		FD_SET(sck, &readfs);
