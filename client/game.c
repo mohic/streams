@@ -15,7 +15,37 @@ void listerJoueurs(game *g, int semid)
 	
 	down(semid);
 		for (i = 0; i < g->nbrJoueur; i++)
-			printf("Nom: %s, score: %d\n", g->nom[i], g->score[i]);
+			printf("Nom: %s\n", g->nom[i]);
+	up(semid);
+}
+
+void afficherTuiles()
+{
+	int i;
+
+	printf("Emplacements : ");
+	for (i = 0; i < 20; i++)
+		printf("[%.2d] ", i + 1);
+	
+	printf("\nValeurs      : ");
+	for(i = 0; i < 20; i++)
+		if (tuiles[i] == 0)
+			printf("[  ] ");
+		else
+			printf("[%.2d] ", tuiles[i]);
+	
+	printf("\n");
+}
+
+void scoreJoueurs(game *g, int semid)
+{
+	int i;
+
+	printf("Score des joueurs\n");
+
+	down(semid);
+		for(i = 0; i < g->nbrJoueur; i++)
+			printf("%s a obtenu %d\n", g->nom[i], g->score[i]);
 	up(semid);
 }
 
@@ -52,16 +82,10 @@ int traiterMessage(int sckClient, char *message, game *g, int semid)
 			char msg[TAILLE_BUFFER] = {'\0'};
 			sprintf(msg, "5=%d", score);
 			envoyerMessage(sckClient, msg);
+			break;	
+		case '5':
+			scoreJoueurs(g, semid);
 			break;
-			
-		/*case '5':
-			down(semid);
-				message += 2;
-				g->score[joueur] = atoi(message);
-				printf("Score du joueur %s: %d\n", g->nom[joueur], g->score[joueur]); 
-			up(semid);
-			break;*/
-
 		default:
 			printf("Message inconnu: %s\n", message);
 			return -1;
@@ -71,7 +95,8 @@ int traiterMessage(int sckClient, char *message, game *g, int semid)
 }
 
 void placerTuiles(int tuile) {
-		
+
+	afficherTuiles();		
 	printf("Veuilliez encoder son emplacement: ");
 	int placement;
 	scanf("%d", &placement);

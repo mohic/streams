@@ -18,8 +18,10 @@
 int tuiles[20];
 
 void listerJoueurs(game *g, int semid);
+void afficherTuiles();
 int traiterMessage(int sckClient, char *message, game *g, int semid);
 void placerTuiles(int tuile);
 int calculerScore();
+void scoreJoueurs(game *g, int semid);
 
 #endif

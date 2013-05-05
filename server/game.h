@@ -20,5 +20,6 @@ int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid,
 void demarrerPartie(int sockets[], int taille, game *g, int semid);
 void piocherTuile(int sockets[], int taille, game *g, int semid);
 void finPartie(int sockets[], int taille, game *g, int semid);
+void finJeu(game *g, int semid);
 
 #endif
