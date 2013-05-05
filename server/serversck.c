@@ -45,7 +45,7 @@ int ouvrirSocket(unsigned short port)
 
 int accepterClient(int socket) {
 	SOCKADDR_IN sin;
-	int structsize;
+	int structsize = sizeof(sin);
 
 	int sckClient = accept(socket, (SOCKADDR *)&sin, &structsize);
 	
