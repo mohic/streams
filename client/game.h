@@ -15,8 +15,11 @@
 #include "../common/common.h"
 #include "../common/semaphore.h"
 
+int tuiles[20];
+
 void listerJoueurs(game *g, int semid);
 int traiterMessage(int sckClient, char *message, game *g, int semid);
-int calculerScore(int *cases);
+void placerTuiles(int tuile);
+int calculerScore();
 
 #endif

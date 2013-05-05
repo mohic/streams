@@ -42,17 +42,18 @@ int traiterMessage(int sckClient, char *message, game *g, int semid)
 		case '3':
 			message += 2;
 			printf("La tuile est piochee: %s\n", message);
-			//TODO positioner tuile
+			placerTuiles(atoi(message));
 			envoyerMessage(sckClient, "3");
 			break;
 		case '4':
 			printf("Fin de la partie\n");
 
-			//TODO calculer score
-
-			envoyerMessage(sckClient, "5=1234");
-
+			int score = calculerScore();
+			char msg[TAILLE_BUFFER] = {'\0'};
+			sprintf(msg, "5=%d", score);
+			envoyerMessage(sckClient, msg);
 			break;
+			
 		/*case '5':
 			down(semid);
 				message += 2;
@@ -69,16 +70,16 @@ int traiterMessage(int sckClient, char *message, game *g, int semid)
 	return 0;
 }
 
-void placerTuiles(int *cases, int tuile) {
+void placerTuiles(int tuile) {
 		
-	printf("Veuilliez placer la tuile: %d en encodant son emplacement", tuile);
+	printf("Veuilliez encoder son emplacement");
 	int placement;
 	scanf("%d", &placement);
-	cases[placement] = tuile;
+	tuiles[placement] = tuile;
 	
 }
 
-int calculerScore(int *cases) {
+int calculerScore() {
 
 	//suite placé à 1 car on a d'office une suite de 1 au premier
 	int suite = 1;
@@ -89,13 +90,13 @@ int calculerScore(int *cases) {
 	for(i = 0; i < 18; i++) {
 
 		//si on tombe sur un joker
-		if(cases[i+1] == 0) {
+		if(tuiles[i+1] == 0) {
 			suite++;
-			cases[i+i] = cases[i];	//on met la tuile joker à la hauteur de la tuile précédente
+			tuiles[i+i] = tuiles[i];	//on met la tuile joker à la hauteur de la tuile précédente
 						//pour éventuellement continuer la suite
 		}
 		//si la tuile est plus grande que la précédente
-		else if(cases[i+1] >= cases[i]) {
+		else if(tuiles[i+1] >= tuiles[i]) {
 			suite++;
 
 		//si la tuile est plus petite que la précédente
