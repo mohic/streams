@@ -184,7 +184,7 @@ void demarrerPartie(int sockets[], int taille, game *g, int semid)
 	for (i = 0; i < 11; i++) // creer les tuiles de 20 a 30
 		tuiles[i + 28] = i + 20;
 
-	tuiles[39] = 0; // creer le joker (represente sous la valeur de 0 en memoire)
+	tuiles[39] = 42; // creer le joker (represente sous la valeur de 42 en memoire)
 
 	nbrRestant = 40;
 
