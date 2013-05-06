@@ -223,7 +223,8 @@ int main (int argc, char* argv[])
 
 	// fermer les sockets clients
 	for (i = 0; i < nombreJoueurActuel; i++) {
-		fermerSocket(sockets[i]);
+		if (sockets[i] != -1)
+			fermerSocket(sockets[i]);
 	}
 
 	// supprimer semaphore
