@@ -153,6 +153,7 @@ int main (int argc, char* argv[])
 								if (sockets[i] != -1) {
 									printf("Annulation de la partie\n");
 									envoyerMessage(sockets[i], "2");
+									quitter = 1;
 								}
 							}
 						}
