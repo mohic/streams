@@ -31,6 +31,8 @@ void afficherTuiles()
 	for(i = 0; i < 20; i++)
 		if (tuiles[i] == 0)
 			printf("[  ] ");
+		else if (tuiles[i] == 42)
+			printf("[ *] ");
 		else
 			printf("[%.2d] ", tuiles[i]);
 	
@@ -71,7 +73,6 @@ int traiterMessage(int sckClient, char *message, game *g, int semid)
 			return 2;
 		case '3':
 			message += 2;
-			printf("La tuile est piochee: %s\n", message);
 			placerTuiles(atoi(message));
 			envoyerMessage(sckClient, "3");
 			break;
@@ -95,13 +96,30 @@ int traiterMessage(int sckClient, char *message, game *g, int semid)
 }
 
 void placerTuiles(int tuile) {
-
-	afficherTuiles();		
-	printf("Veuilliez encoder son emplacement: ");
 	int placement;
-	scanf("%d", &placement);
-	tuiles[placement] = tuile;
-	
+
+	while(1) {
+		printf("Tuile recue: %d\n", tuile);
+		afficherTuiles();
+		char *msg = "Veuillez encoder son emplacement: ";
+		write(STDOUT_FILENO, msg, strlen(msg));
+		char buffer[3] = {'\0'};
+		read(STDOUT_FILENO, buffer, 2);
+		//TODO vider le trop plein
+
+		write(STDOUT_FILENO, "\n", 1);
+		
+		placement = atoi(buffer);
+
+		if (placement < 1 || placement > 20)
+			printf("Veuillez entrez un nombre entre 1 et 20\n");
+		else {
+			printf("Tuile placee. En attente du placement des autres joueurs\n");
+			break;
+		}
+	}
+
+	tuiles[placement - 1] = tuile;
 }
 
 int calculerScore() {
