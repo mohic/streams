@@ -82,15 +82,21 @@ int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid,
 
 				ontTousPlace = 1;
 
+				printf("a\n");
+
 				for(i = 0; i < g->nbrJoueur; i++)
 					if (!tuilePlacee[i]) {
 						ontTousPlace = 0;
+						printf("b\n");
 						break;
 					}
+				printf("c\n");
 			up(semid);
 
-			if (ontTousPlace)
+			if (ontTousPlace) {
 				finJeu(g, semid);
+				return -1;
+			}
 			break;
 
 		default:
@@ -103,11 +109,14 @@ int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid,
 
 void finJeu(game *g, int semid)
 {
-	down(semid);
-		printf("La gagnant est: %s\n", g->nom[0]); //TODO
-	up(semid);
-
 	int i;
+
+	printf("Tous les scores ont ete recus\n");
+
+	down(semid);
+		for (i = 0; i < g->nbrJoueur; i++)
+		printf("%s a eu %d\n", g->nom[i], g->score[i]);
+	up(semid);
 
 	for (i = 0; i < tailleScks; i++)
 		envoyerMessage(scks[i], "5");
@@ -165,7 +174,7 @@ void demarrerPartie(int sockets[], int taille, game *g, int semid)
 	
 	tailleScks = taille;
 
-	tour = 20;
+	tour = TOUR;
 
 	printf("La partie commence\n");
 

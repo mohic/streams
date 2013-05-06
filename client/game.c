@@ -24,11 +24,11 @@ void afficherTuiles()
 	int i;
 
 	printf("Emplacements : ");
-	for (i = 0; i < 20; i++)
+	for (i = 0; i < TOUR; i++)
 		printf("[%.2d] ", i + 1);
 	
 	printf("\nValeurs      : ");
-	for(i = 0; i < 20; i++)
+	for(i = 0; i < TOUR; i++)
 		if (tuiles[i] == 0)
 			printf("[  ] ");
 		else if (tuiles[i] == 42)
@@ -86,7 +86,7 @@ int traiterMessage(int sckClient, char *message, game *g, int semid)
 			break;	
 		case '5':
 			scoreJoueurs(g, semid);
-			break;
+			return 2;
 		default:
 			printf("Message inconnu: %s\n", message);
 			return -1;
@@ -110,8 +110,8 @@ void placerTuiles(int tuile) {
 		
 		placement = atoi(buffer);
 
-		if (placement < 1 || placement > 20)
-			printf("Veuillez entrez un nombre entre 1 et 20\n");
+		if (placement < 1 || placement > TOUR)
+			printf("Veuillez entrez un nombre entre 1 et %d\n", TOUR);
 		else if (tuiles[placement - 1] != 0)
 			printf("Emplacement deja prit. Choisissez en un autre\n");
 		else {

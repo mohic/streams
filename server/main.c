@@ -104,7 +104,9 @@ int main (int argc, char* argv[])
 	signal(SIGALRM, startgame);
 	alarm(TEMPS_ATTENTE);
 
-	while(1) {
+	int quitter = 0;
+
+	while(!quitter) {
 		down(semid);
 			int nbr = g->nbrJoueur;
 		up(semid);
@@ -136,7 +138,7 @@ int main (int argc, char* argv[])
 
 					if (val > 0) {
 						if (traiterMessage(sockets[i], message, g, i, semid, gameStarted) == -1)
-							break;
+							quitter = 1;
 					} else if (val == 0) {
 						down(semid);
 							printf("Perte de connexion avec le joueur %s\n", g->nom[i]);
@@ -159,6 +161,9 @@ int main (int argc, char* argv[])
 			}
 		}
 
+		if (quitter)
+			break;
+
 		FD_ZERO(&readfs);
 		FD_SET(sck, &readfs);
 
@@ -170,7 +175,7 @@ int main (int argc, char* argv[])
 				continue;
 
 			perror("select");
-			return 1;
+			break;
 		} else if (ret > 0) {
 			printf("Nouveau joueur présent\n");
 			int sckClient = accepterClient(sck);
@@ -197,7 +202,7 @@ int main (int argc, char* argv[])
 				continue;
 
 			perror("select");
-			return 1;
+			break;
 		} else if (ret > 0) {
 			char msg[3] = {'\0'};
 			int size = read(STDIN_FILENO, msg, 2);
@@ -206,9 +211,12 @@ int main (int argc, char* argv[])
 				while(read(STDIN_FILENO, NULL, 80) > 0);
 			}
 
-			if (size == 0) // si ctrl-D alors quitter le server
-				//TODO annuler la partie
+			if (size == 0) { // si ctrl-D alors quitter le server
+				for (i = 0; i < nombreJoueurActuel; i++)
+					if (sockets[i] != -1)
+						envoyerMessage(sockets[i], "2"); // envoyer un partie annulee car le serveur s'arrete
 				break;
+			}
 		}
 	}
 
@@ -226,5 +234,6 @@ int main (int argc, char* argv[])
 
 	// fermeture de la socket
 	printf("Good bye !!!\n");
+
 	return fermerSocket(sck);
 }

@@ -15,6 +15,7 @@
 #define TAILLE_BUFFER 50
 #define MAX_JOUEUR 4
 #define SHM_KEY 10101
+#define TOUR 2
 
 typedef struct game
 {

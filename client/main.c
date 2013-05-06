@@ -113,6 +113,8 @@ int main (int argc, char* argv[])
 	// fermeture du semaphore
 	deleteSemaphore(semid);
 
+	printf ("Au revoir\n");
+
 	// ferneture de la socket
 	return fermerSocket(sck);
 }
