@@ -69,7 +69,7 @@ int traiterMessage(int sckClient, char *message, game *g, int semid)
 
 			break;
 		case '2':
-			printf("La partie est annulee\n");
+			printf("La partie est annulee. Il semblerait que comme vous etes le dernier joueur, vous avez gagne\n");
 			return 2;
 		case '3':
 			message += 2;
@@ -149,7 +149,7 @@ int calculerScore() {
 		}
 	}
 
-	score = score + talbeauPoints[suite];
+	score = score + tableauPoints[suite];
 
 	return score;
 }
