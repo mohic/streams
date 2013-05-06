@@ -17,6 +17,10 @@ int ouvrirSocket(unsigned short port)
 		perror("socket");
 		return -1;
 	}
+
+	// autoriser de reutiliser le coket
+	int on = 1;
+	setsockopt(sck, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on) ); 
 	
 	// configuration du socket
 	SOCKADDR_IN sin;

@@ -252,5 +252,9 @@ int main (int argc, char* argv[])
 	// fermeture de la socket
 	printf("Good bye !!!\n");
 
-	return fermerSocket(sck);
+	fermerSocket(sck);
+
+	main(argc, argv); // reeinit le serveur
+
+	return 0;
 }
