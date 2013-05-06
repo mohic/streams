@@ -55,6 +55,8 @@ int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid,
 		case '3':
 			tuilePlacee[joueur] = 1;
 
+			printf("joueur %d\n", joueur);
+
 			down(semid);
 				printf("Le joueur %s a placé sa tuile\n", g->nom[joueur]);
 				nbrJoueur = g->nbrJoueur;
@@ -63,9 +65,8 @@ int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid,
 			nbrPlace = 0;
 
 			for (i = 0; i < MAX_JOUEUR; i++)
-				if (scks[i] != -1 && tuilePlacee[i]) {
+				if (scks[i] != -1 && tuilePlacee[i])
 					nbrPlace++;
-				}
 
 			if (nbrPlace >= nbrJoueur && tour <= 0) // fin partie
 				finPartie(scks, tailleScks, g, semid);
@@ -86,9 +87,8 @@ int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid,
 			nbrPlace = 0;
 
 			for(i = 0; i < MAX_JOUEUR; i++)
-				if (scks[i] != -1 && tuilePlacee[i]) {
+				if (scks[i] != -1 && tuilePlacee[i])
 					nbrPlace++;
-				}
 
 			if (nbrPlace >= nbrJoueur) {
 				finJeu(g, semid);
@@ -198,16 +198,12 @@ void demarrerPartie(int sockets[], int taille, game *g, int semid)
 	piocherTuile(sockets, taille, g, semid);
 }
 
-void update(int sockets[], int taille, game *g, int semid, int socketDeconnecte)
+void update(int sockets[], int taille, game *g, int semid, int socketDeconnecte, int joueur)
 {
 	int i;
-	int num = -1;
 
-	for (i = 0; i < taille; i++) {
+	for (i = 0; i < taille; i++)
 		scks[i] = sockets[i];
-		if (sockets[i] == socketDeconnecte)
-			num = i;
-	}
 	
 	tailleScks = taille;
 
@@ -216,5 +212,5 @@ void update(int sockets[], int taille, game *g, int semid, int socketDeconnecte)
 		g->nbrJoueur--;
 	up(semid);
 
-	traiterMessage(socketDeconnecte, "3", g, num, semid, 1);
+	traiterMessage(socketDeconnecte, "3", g, joueur, semid, 1);
 }

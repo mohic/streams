@@ -21,6 +21,6 @@ void demarrerPartie(int sockets[], int taille, game *g, int semid);
 void piocherTuile(int sockets[], int taille, game *g, int semid);
 void finPartie(int sockets[], int taille, game *g, int semid);
 void finJeu(game *g, int semid);
-void update(int sockets[], int taille, game *g, int semid, int socketDeconnecte);
+void update(int sockets[], int taille, game *g, int semid, int socketDeconnecte, int joueur);
 
 #endif

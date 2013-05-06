@@ -128,11 +128,13 @@ int main (int argc, char* argv[])
 
 		FD_ZERO(&readfsJoueur);
 
+		int numSck;
+
 		for (i = 0; i < MAX_JOUEUR; i++)
 			if (sockets[i] != -1)
-				FD_SET(sockets[i], &readfsJoueur);
+				FD_SET(numSck = sockets[i], &readfsJoueur);
 
-		ret = select(sockets[nbrJoueurActuel - 1] + 1, &readfsJoueur, NULL, NULL, &tv);
+		ret = select(numSck + 1, &readfsJoueur, NULL, NULL, &tv);
 
 		if (ret > 0) {
 			for (i = 0; i < MAX_JOUEUR; i++) {
@@ -163,7 +165,7 @@ int main (int argc, char* argv[])
 								}
 							}
 						} else {
-							update(sockets, MAX_JOUEUR, g, semid, sockets[i]);
+							update(sockets, MAX_JOUEUR, g, semid, sockets[i], i);
 						}
 					}
 				}
