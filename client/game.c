@@ -138,8 +138,14 @@ void placerTuiles(int tuile) {
 	int placement;
 
 	while(1) {
-		char m[14 + 10];
-		snprintf(m, sizeof(m), "Tuile recue: %d\n", tuile);
+		if (tuile == 42) {
+			char *m1 = "Tuile recue: Joker\n";
+			write(STDOUT_FILENO, m1, strlen(m1));
+		} else {
+			char m[14 + 10];
+			snprintf(m, sizeof(m), "Tuile recue: %d\n", tuile);
+			write(STDOUT_FILENO, m, strlen(m));
+		}
 
 		afficherTuiles();
 		char *msg = "Veuillez encoder son emplacement: ";

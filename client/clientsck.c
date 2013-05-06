@@ -27,7 +27,11 @@ int connexion(char *addresse, unsigned short port)
 
 	// connexion au serveur
 	if (connect(sck, (SOCKADDR *)&sin, sizeof(sin))) {
-		perror("connect");
+		if (errno == 111) // pas de serveur
+			printf("Aucun serveur present\n");
+		else
+			perror("connect");
+
 		fermerSocket(sck);
 		return -1;
 	}
