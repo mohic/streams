@@ -149,6 +149,8 @@ int calculerScore() {
 		}
 	}
 
+	score = score + talbeauPoints[suite];
+
 	return score;
 }
 
