@@ -119,7 +119,6 @@ void placerTuiles(int tuile) {
 	}
 
 	tuiles[placement - 1] = tuile;
->>>>>>> 65cc7bb97af64d24819d70bae9d9a5bf33e952da
 }
 
 int calculerScore() {
