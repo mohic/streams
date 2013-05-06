@@ -72,6 +72,7 @@ void scoreJoueurs(game *g, int semid)
 			write(STDOUT_FILENO, m2, strlen(m2));
 			if(g->score[i] > top) {
 				numTop = i;
+				top = g->score[i];
 			}
 		}
 	char gagnant[TAILLE_NOM + 16 +1] = {'\0'};
