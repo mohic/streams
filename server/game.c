@@ -17,7 +17,8 @@ int tailleScks;
 
 int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid, int aDemarre) {
 	int i;
-	int ontTousPlace;
+	int nbrPlace;
+	int nbrJoueur;
 
 	if (strlen(message) <= 0)
 		return -1;
@@ -56,19 +57,19 @@ int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid,
 
 			down(semid);
 				printf("Le joueur %s a placé sa tuile\n", g->nom[joueur]);
+				nbrJoueur = g->nbrJoueur;
 			up(semid);
 
-			ontTousPlace = 1;
+			nbrPlace = 0;
 
 			for (i = 0; i < MAX_JOUEUR; i++)
-				if (scks[i] != -1 && !tuilePlacee[i]) {
-					ontTousPlace = 0;
-					break;
+				if (scks[i] != -1 && tuilePlacee[i]) {
+					nbrPlace++;
 				}
 
-			if (ontTousPlace && tour <= 0) // fin partie
+			if (nbrPlace >= nbrJoueur && tour <= 0) // fin partie
 				finPartie(scks, tailleScks, g, semid);
-			else if (ontTousPlace) // piocher le suivant
+			else if (nbrPlace >= nbrJoueur) // piocher le suivant
 				piocherTuile(scks, tailleScks, g, semid);
 
 			break;
@@ -79,18 +80,17 @@ int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid,
 				message += 2;
 				g->score[joueur] = atoi(message);
 				printf("Score du joueur %s: %d\n", g->nom[joueur], g->score[joueur]);
+				nbrJoueur = g->nbrJoueur;
 			up(semid);
 
-			ontTousPlace = 1;
+			nbrPlace = 0;
 
 			for(i = 0; i < MAX_JOUEUR; i++)
-				if (scks[i] != -1 && !tuilePlacee[i]) {
-					ontTousPlace = 0;
-					printf("b\n");
-					break;
+				if (scks[i] != -1 && tuilePlacee[i]) {
+					nbrPlace++;
 				}
 
-			if (ontTousPlace) {
+			if (nbrPlace >= nbrJoueur) {
 				finJeu(g, semid);
 				return -1;
 			}
