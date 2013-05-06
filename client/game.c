@@ -60,7 +60,8 @@ void afficherTuiles()
 void scoreJoueurs(game *g, int semid)
 {
 	int i;
-
+	int top = -1;
+	int numTop = -1;
 	char *m = "Score des joueurs\n";
 	write(STDOUT_FILENO, m, strlen(m));
 
@@ -69,7 +70,13 @@ void scoreJoueurs(game *g, int semid)
 			char m2[TAILLE_NOM + 11 + 10 + 1] = {'\0'};
 			snprintf(m2, TAILLE_NOM + 11 + 10 + 1, "%s a obtenu %d\n", g->nom[i], g->score[i]);
 			write(STDOUT_FILENO, m2, strlen(m2));
+			if(g->score[i] > top) {
+				numTop = i;
+			}
 		}
+	char gagnant[TAILLE_NOM + 16 +1] = {'\0'};
+	snprintf(gagnant, TAILLE_NOM + 16 + 1, "Le gagnant est %s\n", g->nom[numTop]);
+	write(STDOUT_FILENO, gagnant, strlen(gagnant));
 	up(semid);
 }
 
@@ -88,9 +95,9 @@ int traiterMessage(int sckClient, char *message, game *g, int semid)
 			} else {
 				char *m2 = "Vous etes maintenant inscrit pour la prochaine partie\n";
 				write(STDOUT_FILENO, m2, strlen(m2));
-			}
+				listerJoueurs(g, semid);
 
-			listerJoueurs(g, semid);
+			}
 
 			break;
 		case '2':
@@ -149,7 +156,7 @@ void placerTuiles(int tuile) {
 			char m2[40];
 			snprintf(m2, 40, "Veuillez entrez un nombre entre 1 et %d\n", TOUR);
 			write(STDOUT_FILENO, m2, strlen(m2));
-		else if (tuiles[placement - 1] != 0) {
+		} else if (tuiles[placement - 1] != 0) {
 			char *m3 = "Emplacement deja prit. Choisissez en un autre\n";
 			write(STDOUT_FILENO, m3, strlen(m3));
 		} else {
