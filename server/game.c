@@ -117,7 +117,8 @@ void finJeu(game *g, int semid)
 	up(semid);
 
 	for (i = 0; i < tailleScks; i++)
-		envoyerMessage(scks[i], "5");
+		if (scks[i] != -1)
+			envoyerMessage(scks[i], "5");
 }
 
 void finPartie(int sockets[], int taille, game *g, int semid)
@@ -131,7 +132,8 @@ void finPartie(int sockets[], int taille, game *g, int semid)
 		tuilePlacee[i] = 0;
 
 	for (i = 0; i < taille; i++)
-		envoyerMessage(sockets[i], "4");
+		if (sockets[i] != -1)
+			envoyerMessage(sockets[i], "4");
 }
 
 void piocherTuile(int sockets[], int taille, game *g, int semid)
@@ -156,7 +158,8 @@ void piocherTuile(int sockets[], int taille, game *g, int semid)
 		tuilePlacee[i] = 0;
 
 	for (i = 0; i < taille; i++)
-		envoyerMessage(sockets[i], msg);
+		if (sockets[i] != -1)
+			envoyerMessage(sockets[i], msg);
 }
 
 void demarrerPartie(int sockets[], int taille, game *g, int semid)
@@ -198,9 +201,13 @@ void demarrerPartie(int sockets[], int taille, game *g, int semid)
 void update(int sockets[], int taille, game *g, int semid, int socketDeconnecte)
 {
 	int i;
+	int num = -1;
 
-	for (i = 0; i < taille; i++)
+	for (i = 0; i < taille; i++) {
 		scks[i] = sockets[i];
+		if (sockets[i] == socketDeconnecte)
+			num = i;
+	}
 	
 	tailleScks = taille;
 
@@ -209,5 +216,5 @@ void update(int sockets[], int taille, game *g, int semid, int socketDeconnecte)
 		g->nbrJoueur--;
 	up(semid);
 
-	traiterMessage(socketDeconnecte, "3", g, 0, semid, 1);
+	traiterMessage(socketDeconnecte, "3", g, num, semid, 1);
 }
