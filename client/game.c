@@ -112,6 +112,8 @@ void placerTuiles(int tuile) {
 
 		if (placement < 1 || placement > 20)
 			printf("Veuillez entrez un nombre entre 1 et 20\n");
+		else if (tuiles[placement - 1] != 0)
+			printf("Emplacement deja prit. Choisissez en un autre\n");
 		else {
 			printf("Tuile placee. En attente du placement des autres joueurs\n");
 			break;
