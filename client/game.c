@@ -100,24 +100,23 @@ void placerTuiles(int tuile) {
 	printf("Veuilliez encoder son emplacement: ");
 	int placement;
 	scanf("%d", &placement);
-	tuiles[placement] = tuile;
+	tuiles[placement-1] = tuile;
 	
 }
 
 int calculerScore() {
 
-	//suite placé à 1 car on a d'office une suite de 1 au premier
 	int suite = 0;
 	int score = 0;
 	int tableauPoints[20] = {0, 1, 3, 5, 7, 9, 11, 15, 20, 25, 30, 35, 40, 50, 60, 70, 85, 100, 150, 300};
 	
 	int i;
-	for(i = 0; i < 18; i++) {
+	for(i = 0; i <= 18; i++) {
 
 		//si on tombe sur un joker
-		if(tuiles[i+1] == 0) {
+		if(tuiles[i+1] == 42) {
 			suite++;
-			tuiles[i+i] = tuiles[i];	//on met la tuile joker à la hauteur de la tuile précédente
+			tuiles[i+1] = tuiles[i];	//on met la tuile joker à la hauteur de la tuile précédente
 						//pour éventuellement continuer la suite
 		}
 		//si la tuile est plus grande que la précédente
