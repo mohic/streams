@@ -55,8 +55,6 @@ int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid,
 		case '3':
 			tuilePlacee[joueur] = 1;
 
-			printf("joueur %d\n", joueur);
-
 			down(semid);
 				printf("Le joueur %s a placé sa tuile\n", g->nom[joueur]);
 				nbrJoueur = g->nbrJoueur;
