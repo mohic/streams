@@ -63,7 +63,7 @@ int main (int argc, char* argv[])
 		return 1;
 	}
 
-	// ouvrir la socket
+	// ouvrir le socket
 	int sck = ouvrirSocket((unsigned short)port);
 
 	if (sck == -1) {
@@ -94,6 +94,7 @@ int main (int argc, char* argv[])
 
 	int sockets[MAX_JOUEUR];
 	int nombreJoueurActuel = 0;
+	int nbrPerteConnexion = 0;
 
 	sockets[nombreJoueurActuel++] = accepterClient(sck);
 
@@ -143,6 +144,16 @@ int main (int argc, char* argv[])
 						
 						fermerSocket(sockets[i]);
 						sockets[i] = -1;
+						nbrPerteConnexion++;
+
+						if (gameStarted && (nombreJoueurActuel - nbrPerteConnexion) < 2) { // mettre fin a la partie
+							for (i = 0; i < nombreJoueurActuel; i++) {
+								if (sockets[i] != -1) {
+									printf("Annulation de la partie\n");
+									envoyerMessage(sockets[i], "2");
+								}
+							}
+						}
 					}
 				}
 			}
