@@ -149,7 +149,7 @@ int calculerScore() {
 		}
 	}
 
-	score = score + talbeauPoints[suite];
+	score = score + tableauPoints[suite];
 
 	return score;
 }
