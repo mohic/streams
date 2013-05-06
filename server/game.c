@@ -56,15 +56,15 @@ int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid,
 
 			down(semid);
 				printf("Le joueur %s a placé sa tuile\n", g->nom[joueur]);
-
-				ontTousPlace = 1;
-
-				for (i = 0; i < g->nbrJoueur; i++)
-					if (!tuilePlacee[i]) {
-						ontTousPlace = 0;
-						break;
-					}
 			up(semid);
+
+			ontTousPlace = 1;
+
+			for (i = 0; i < MAX_JOUEUR; i++)
+				if (scks[i] != -1 && !tuilePlacee[i]) {
+					ontTousPlace = 0;
+					break;
+				}
 
 			if (ontTousPlace && tour <= 0) // fin partie
 				finPartie(scks, tailleScks, g, semid);
@@ -79,19 +79,16 @@ int traiterMessage(int sckClient, char *message, game *g, int joueur, int semid,
 				message += 2;
 				g->score[joueur] = atoi(message);
 				printf("Score du joueur %s: %d\n", g->nom[joueur], g->score[joueur]);
-
-				ontTousPlace = 1;
-
-				printf("a\n");
-
-				for(i = 0; i < g->nbrJoueur; i++)
-					if (!tuilePlacee[i]) {
-						ontTousPlace = 0;
-						printf("b\n");
-						break;
-					}
-				printf("c\n");
 			up(semid);
+
+			ontTousPlace = 1;
+
+			for(i = 0; i < MAX_JOUEUR; i++)
+				if (scks[i] != -1 && !tuilePlacee[i]) {
+					ontTousPlace = 0;
+					printf("b\n");
+					break;
+				}
 
 			if (ontTousPlace) {
 				finJeu(g, semid);
@@ -114,8 +111,9 @@ void finJeu(game *g, int semid)
 	printf("Tous les scores ont ete recus\n");
 
 	down(semid);
-		for (i = 0; i < g->nbrJoueur; i++)
-		printf("%s a eu %d\n", g->nom[i], g->score[i]);
+		for (i = 0; i < MAX_JOUEUR; i++)
+			if (scks[i] != -1)
+				printf("%s a eu %d\n", g->nom[i], g->score[i]);
 	up(semid);
 
 	for (i = 0; i < tailleScks; i++)
@@ -129,10 +127,8 @@ void finPartie(int sockets[], int taille, game *g, int semid)
 	printf("Fin de la partie. En attente du score des joueurs\n");
 
 	// reset tuile placee (utilisee pour savoir si tout les scores ont ete recus)
-	down(semid);
-		for (i = 0; i < g->nbrJoueur; i++)
-			tuilePlacee[i] = 0;
-	up(semid);
+	for (i = 0; i < MAX_JOUEUR; i++)
+		tuilePlacee[i] = 0;
 
 	for (i = 0; i < taille; i++)
 		envoyerMessage(sockets[i], "4");
@@ -156,10 +152,8 @@ void piocherTuile(int sockets[], int taille, game *g, int semid)
 	tour--;
 
 	// reset tuile placee
-	down(semid);
-		for (i = 0; i < g->nbrJoueur; i++)
-			tuilePlacee[i] = 0;
-	up(semid);
+	for (i = 0; i < MAX_JOUEUR; i++)
+		tuilePlacee[i] = 0;
 
 	for (i = 0; i < taille; i++)
 		envoyerMessage(sockets[i], msg);
@@ -199,4 +193,21 @@ void demarrerPartie(int sockets[], int taille, game *g, int semid)
 
 	// demarrer le jeu en piochant la 1ere tuile
 	piocherTuile(sockets, taille, g, semid);
+}
+
+void update(int sockets[], int taille, game *g, int semid, int socketDeconnecte)
+{
+	int i;
+
+	for (i = 0; i < taille; i++)
+		scks[i] = sockets[i];
+	
+	tailleScks = taille;
+
+	// traiter message comme si le joueur avait repondu present mais en le retirant du jeu
+	down(semid);
+		g->nbrJoueur--;
+	up(semid);
+
+	traiterMessage(socketDeconnecte, "3", g, 0, semid, 1);
 }

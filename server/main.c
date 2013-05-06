@@ -11,7 +11,7 @@
 #include "../common/common.h"
 #include "../common/semaphore.h"
 
-#define TEMPS_ATTENTE 10
+#define TEMPS_ATTENTE 30
 
 int gameStarted;
 int timeElapsed;
@@ -93,10 +93,13 @@ int main (int argc, char* argv[])
 	tv.tv_usec = 0;
 
 	int sockets[MAX_JOUEUR];
-	int nombreJoueurActuel = 0;
-	int nbrPerteConnexion = 0;
 
-	sockets[nombreJoueurActuel++] = accepterClient(sck);
+	for (i = 0; i < MAX_JOUEUR; i++)
+		sockets[i] = -1;
+
+	int nbrJoueurActuel = 0;
+
+	sockets[nbrJoueurActuel++] = accepterClient(sck);
 
 	printf("Appuyer sur CTRL+D pour quitter le serveur\n");
 
@@ -113,7 +116,7 @@ int main (int argc, char* argv[])
 		
 		if (!gameStarted && timeElapsed && g->nbrJoueur >= 2) {
 			gameStarted = 1;
-			demarrerPartie(sockets, nombreJoueurActuel, g, semid);
+			demarrerPartie(sockets, nbrJoueurActuel, g, semid);
 		}
 
 		int ret = 0;
@@ -125,14 +128,15 @@ int main (int argc, char* argv[])
 
 		FD_ZERO(&readfsJoueur);
 
-		for (i = 0; i < nombreJoueurActuel; i++)
-			FD_SET(sockets[i], &readfsJoueur);
+		for (i = 0; i < MAX_JOUEUR; i++)
+			if (sockets[i] != -1)
+				FD_SET(sockets[i], &readfsJoueur);
 
-		ret = select(sockets[nombreJoueurActuel - 1] + 1, &readfsJoueur, NULL, NULL, &tv);
+		ret = select(sockets[nbrJoueurActuel - 1] + 1, &readfsJoueur, NULL, NULL, &tv);
 
 		if (ret > 0) {
-			for (i = 0; i < nombreJoueurActuel; i++) {
-				if (FD_ISSET(sockets[i], &readfsJoueur)) {
+			for (i = 0; i < MAX_JOUEUR; i++) {
+				if (sockets[i] != -1 && FD_ISSET(sockets[i], &readfsJoueur)) {
 					char message[TAILLE_BUFFER + 1] = {'\0'};
 					int val = recevoirMessage(sockets[i], message);
 
@@ -146,16 +150,20 @@ int main (int argc, char* argv[])
 						
 						fermerSocket(sockets[i]);
 						sockets[i] = -1;
-						nbrPerteConnexion++;
+						nbrJoueurActuel--;
 
-						if (gameStarted && (nombreJoueurActuel - nbrPerteConnexion) < 2) { // mettre fin a la partie
-							for (i = 0; i < nombreJoueurActuel; i++) {
-								if (sockets[i] != -1) {
+						if (gameStarted && nbrJoueurActuel < 2) { // mettre fin a la partie
+							int j;
+
+							for (j = 0; j < MAX_JOUEUR; j++) {
+								if (sockets[j] != -1) {
 									printf("Annulation de la partie\n");
-									envoyerMessage(sockets[i], "2");
+									envoyerMessage(sockets[j], "2");
 									quitter = 1;
 								}
 							}
+						} else {
+							update(sockets, MAX_JOUEUR, g, semid, sockets[i]);
 						}
 					}
 				}
@@ -181,15 +189,20 @@ int main (int argc, char* argv[])
 			printf("Nouveau joueur présent\n");
 			int sckClient = accepterClient(sck);
 
-			if (nombreJoueurActuel >= MAX_JOUEUR || gameStarted) {
+			if (nbrJoueurActuel >= MAX_JOUEUR || gameStarted) {
 				envoyerMessage(sckClient, "1=0"); // inscription refusee
 				printf("inscription refusee\n");
 				fermerSocket(sckClient); // fermer le socket
 				continue;
 			}
 
-			sockets[nombreJoueurActuel] = sckClient;
-			nombreJoueurActuel++;
+			for (i = 0; i < MAX_JOUEUR; i++) {
+				if (sockets[i] == -1) {
+					sockets[i] = sckClient;
+					nbrJoueurActuel++;
+					break;
+				}
+			}
 		}
 
 		tv.tv_sec = 0;
@@ -213,7 +226,7 @@ int main (int argc, char* argv[])
 			}
 
 			if (size == 0) { // si ctrl-D alors quitter le server
-				for (i = 0; i < nombreJoueurActuel; i++)
+				for (i = 0; i < MAX_JOUEUR; i++)
 					if (sockets[i] != -1)
 						envoyerMessage(sockets[i], "2"); // envoyer un partie annulee car le serveur s'arrete
 				break;
@@ -222,7 +235,7 @@ int main (int argc, char* argv[])
 	}
 
 	// fermer les sockets clients
-	for (i = 0; i < nombreJoueurActuel; i++) {
+	for (i = 0; i < MAX_JOUEUR; i++) {
 		if (sockets[i] != -1)
 			fermerSocket(sockets[i]);
 	}
